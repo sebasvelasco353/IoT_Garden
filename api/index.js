@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Database references
 var db = admin.database();
-var ref = db.ref("plants");
+var ref = db.ref("/plants");
 
 // middleware
 function hasId(req, res, next) {
@@ -48,7 +48,7 @@ function hasId(req, res, next) {
         return;
     } else {
         ref.once("value", function(snapshot) {
-            req.body.plant_id = Object.keys(snapshot.val()).length;
+            req.body.plant_id = snapshot.val() ? Object.keys(snapshot.val()).length + 1 : 1;
             next();
         }, function (errorObject) {
             console.log("The read failed: " + errorObject.code);
@@ -60,17 +60,27 @@ function hasId(req, res, next) {
 
 // Endpoints
 app.get("/get_plants", function(req, res){
-    ref.once("value", function(snapshot) {
+    ref.on("value", function(snapshot) {
+        var arr = [];
+        const keys = Object.keys(snapshot.val())
+        keys.forEach((key, index) => {
+            console.log(key);
+            arr.push({
+                id: key,
+                content: snapshot.val()[key]
+            })
+        });
+        console.log("arreglo:", arr)
         res.status(200).json({
             status: 200,
-            response: snapshot.val()
+            response: arr
         })
     });
 });
 
 app.post("/plant_setup", hasId, function(req, res){
     // TODO: Refactor this!!!!!
-    
+
    var date = new Date().toString();
    var plantRef = ref.child(req.body.plant_id);
    plantRef.child(date).set({
