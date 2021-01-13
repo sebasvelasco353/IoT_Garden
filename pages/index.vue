@@ -5,22 +5,22 @@
     <div v-for="(plant, index) in plants" :key="index" class="plant_content">
       <p>the plant is: {{ plant.id }} </p>
       <div>
-        {{plant.content}}  
-      </div>      
+        {{plant.content}}
+      </div>
     </div>
   </section>
 </template>
 
 <script>
-  export default {
-    async asyncData({ $axios }) {
-      const plants = await $axios.$get('http://localhost:3000/api/get_plants');
-      console.log(plants);
-      return { 
-        plants: plants.response
-      }
-    }
-  }
+export default {
+  async asyncData({ $axios }) {
+    const plants = await $axios.$get('http://localhost:3000/api/get_plants');
+    console.log(plants);
+    return {
+      plants: plants.response,
+    };
+  },
+};
 </script>
 
 <style scoped>
