@@ -34,24 +34,19 @@ function hasId(req, res, next) {
       ...req.body,
     }, (error) => {
       if (error) {
-        res.status(500).json({
+        return res.status(500).json({
           error,
         });
-      } else {
-        res.status(200).json({
-          response: 'ok',
-        });
       }
+      return res.status(200).json({
+        response: 'ok',
+      });
     });
-    // return;
   } else {
     ref.once('value', (snapshot) => {
       req.body.plant_id = snapshot.val() ? Object.keys(snapshot.val()).length + 1 : 1;
       next();
-    }, (errorObject) => {
-      res.status(500).send(errorObject.code);
-    });
-    // return;
+    }, (errorObject) => res.status(500).send(errorObject.code));
   }
 }
 
@@ -69,28 +64,45 @@ app.get('/get_plants', (req, res) => {
       });
     }
   });
-  res.status(200).json({
+  return res.status(200).json({
     response: arr,
   });
 });
 
 app.post('/plant_setup', hasId, (req, res) => {
   // TODO: Refactor this!!!!!
-
   const date = new Date().toString();
   const plantRef = ref.child(req.body.plant_id);
   plantRef.child(date).set({
     ...req.body,
   }, (error) => {
     if (error) {
-      res.status(500).json({
+      return res.status(500).json({
         error,
       });
-    } else {
-      res.status(200).json({
-        response: 'ok',
+    }
+    return res.status(200).json({
+      response: 'ok',
+    });
+  });
+});
+
+app.get('/get_one', (req, res) => {
+  const arr = [];
+  const queryRef = ref.child(req.query.plant_id);
+  queryRef.once('value', (snapshot) => {
+    if (snapshot.val()) {
+      const keys = Object.keys(snapshot.val());
+      keys.forEach((key) => {
+        arr.push({
+          id: key,
+          content: snapshot.val()[key],
+        });
       });
     }
+    return res.status(200).json({
+      response: arr,
+    });
   });
 });
 
