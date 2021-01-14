@@ -2,12 +2,6 @@
   <section class="container">
     <h1>IoT_Garden Dashboard</h1>
     <p>this is a test</p>
-    <div v-for="(plant, index) in plants" :key="index" class="plant_content">
-      <p>the plant is: {{ plant.id }} </p>
-      <div>
-        {{plant.content}}
-      </div>
-    </div>
   </section>
 </template>
 

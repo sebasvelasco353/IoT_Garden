@@ -27,10 +27,11 @@ const ref = db.ref('/plants');
 
 // middleware
 function hasId(req, res, next) {
+  const month = new Date().getMonth();
+  const day = new Date().getDate();
+  const monthRef = ref.child(month);
   if (req.body.plant_id) {
-    const date = new Date().toString();
-    const plantRef = ref.child(req.body.plant_id);
-    plantRef.child(date).set({
+    monthRef.child(day).child(req.body.plant_id).set({
       ...req.body,
     }, (error) => {
       if (error) {
@@ -43,37 +44,28 @@ function hasId(req, res, next) {
       });
     });
   } else {
-    ref.once('value', (snapshot) => {
-      req.body.plant_id = snapshot.val() ? Object.keys(snapshot.val()).length + 1 : 1;
+    monthRef.child(day).once('value', (snapshot) => {
+      const counter = snapshot.val() ? Object.keys(snapshot.val()).length + 1 : 1;
+      req.body.plant_id = `plant${counter}`;
       next();
     }, (errorObject) => res.status(500).send(errorObject.code));
   }
 }
 
 // Endpoints
-app.get('/get_plants', (req, res) => {
-  const arr = [];
-  ref.on('value', (snapshot) => {
-    if (snapshot.val()) {
-      const keys = Object.keys(snapshot.val());
-      keys.forEach((key) => {
-        arr.push({
-          id: key,
-          content: snapshot.val()[key],
-        });
-      });
-    }
-  });
-  return res.status(200).json({
-    response: arr,
+app.get('/get_plants_today', (req, res) => {
+  const monthRef = ref.child(new Date().getMonth());
+  monthRef.child(new Date().getDate()).once('value', (snapshot) => {
+    res.status(200).send(snapshot.val());
   });
 });
 
 app.post('/plant_setup', hasId, (req, res) => {
   // TODO: Refactor this!!!!!
-  const date = new Date().toString();
-  const plantRef = ref.child(req.body.plant_id);
-  plantRef.child(date).set({
+  const month = new Date().getMonth();
+  const day = new Date().getDate();
+  const monthRef = ref.child(month);
+  monthRef.child(day).child(req.body.plant_id).set({
     ...req.body,
   }, (error) => {
     if (error) {
