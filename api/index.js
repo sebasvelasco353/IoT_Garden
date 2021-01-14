@@ -80,21 +80,12 @@ app.post('/plant_setup', hasId, (req, res) => {
 });
 
 app.get('/get_one', (req, res) => {
-  const arr = [];
-  const queryRef = ref.child(req.query.plant_id);
-  queryRef.once('value', (snapshot) => {
-    if (snapshot.val()) {
-      const keys = Object.keys(snapshot.val());
-      keys.forEach((key) => {
-        arr.push({
-          id: key,
-          content: snapshot.val()[key],
-        });
-      });
-    }
-    return res.status(200).json({
-      response: arr,
-    });
+  const monthRef = ref.child(new Date().getMonth());
+  const dayRef = monthRef.child(new Date().getDate());
+  console.log(req.query);
+  dayRef.orderByChild('plant_id').equalTo(req.query.plant_id).once('value', (snapshot) => {
+    console.log(snapshot.val());
+    res.status(200).send(snapshot.val());
   });
 });
 
