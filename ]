@@ -30,14 +30,10 @@ function hasId(req, res, next) {
   const month = date.getMonth();
   const day = date.getDate();
   const monthRef = ref.child(month);
-  const partOfDay = date.getHours();
-  console.log(partOfDay);
   if (req.body.plant_id) {
     monthRef.child(day).child(req.body.plant_id).set({
-      partOfDay: {
-        date: `${date.getDate()}-${date.getMonth()}`,
-        ...req.body,
-      },
+      ...req.body,
+      date,
     }, (error) => {
       if (error) {
         return res.status(500).json({
@@ -62,46 +58,20 @@ function hasId(req, res, next) {
 // Endpoints
 app.get('/get_plants_today', (req, res) => {
   const date = new Date();
-  const day = date.getDate();
   const month = date.getMonth();
   const monthRef = ref.child(month);
-  monthRef.child(day).once('value', (snapshot) => {
+  monthRef.child(new Date().getDate()).once('value', (snapshot) => {
     res.status(200).send(snapshot.val());
-  });
-});
-
-app.get('/get_plant_date', (req, res) => {
-  // TODO: call firebase and get everuything that has date = date
-  const { date, plant_id } = req.query;
-  const route = `${date.split('-')[0]}/${date.split('-')[1]}/${plant_id}`;
-  ref.child(route).once('value', (snapshot) => {
-    console.log(snapshot.val());
-    res.status(200).json({
-      stauts: 200,
-      ...snapshot.val(),
-    });
   });
 });
 
 app.post('/plant_setup', hasId, (req, res) => {
   const date = new Date();
-  const hours = date.getHours();
   const day = date.getDate();
   const month = date.getMonth();
   const monthRef = ref.child(month);
-  let partOfDay;
-  if (hours < 12) {
-    partOfDay = 'morning';
-  } else if ((hours > 12) && (hours < 18)) {
-    partOfDay = 'evening';
-  } else {
-    partOfDay = 'night';
-  }
   monthRef.child(day).child(req.body.plant_id).set({
-    [partOfDay]: {
-      date: `${date.getDate()}-${date.getMonth()}`,
-      ...req.body,
-    },
+    ...req.body,
   }, (error) => {
     if (error) {
       return res.status(500).json({
@@ -110,7 +80,6 @@ app.post('/plant_setup', hasId, (req, res) => {
     }
     return res.status(200).json({
       ...req.body,
-      date: `${date.getDate()}-${date.getMonth()}`,
       response: 'ok',
     });
   });
@@ -120,7 +89,7 @@ app.get('/get_one', (req, res) => {
   const monthRef = ref.child(new Date().getMonth());
   const dayRef = monthRef.child(new Date().getDate());
   console.log(req.query);
-  dayRef.child(req.query.plant_id).once('value', (snapshot) => {
+  dayRef.orderByChild('plant_id').equalTo(req.query.plant_id).once('value', (snapshot) => {
     console.log(snapshot.val());
     res.status(200).send(snapshot.val());
   });

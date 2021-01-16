@@ -16,5 +16,6 @@ module.exports = {
     'vue',
   ],
   rules: {
+    camelcase: [2, { properties: 'never' }],
   },
 };
