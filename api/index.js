@@ -114,11 +114,22 @@ app.post('/plant_setup', hasId, (req, res) => {
   });
 });
 
-app.get('/get_one', (req, res) => {
+app.get('/get_one_today', (req, res) => {
   const monthRef = ref.child(new Date().getMonth());
   const dayRef = monthRef.child(new Date().getDate());
   dayRef.child(req.query.plant_id).once('value', (snapshot) => {
     res.status(200).send(snapshot.val());
+  });
+});
+
+app.get('/get_month', (req, res) => {
+  const { month } = req.query;
+  const monthRef = ref.child(month);
+  monthRef.once('value', (snapshot) => {
+    res.status(200).json({
+      stauts: 200,
+      ...snapshot.val(),
+    });
   });
 });
 
