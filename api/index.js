@@ -31,10 +31,9 @@ function hasId(req, res, next) {
   const day = date.getDate();
   const monthRef = ref.child(month);
   const partOfDay = date.getHours();
-  console.log(partOfDay);
   if (req.body.plant_id) {
     monthRef.child(day).child(req.body.plant_id).set({
-      partOfDay: {
+      [partOfDay]: {
         date: `${date.getDate()}-${date.getMonth()}`,
         ...req.body,
       },
@@ -75,7 +74,6 @@ app.get('/get_plant_date', (req, res) => {
   const { date, plant_id } = req.query;
   const route = `${date.split('-')[0]}/${date.split('-')[1]}/${plant_id}`;
   ref.child(route).once('value', (snapshot) => {
-    console.log(snapshot.val());
     res.status(200).json({
       stauts: 200,
       ...snapshot.val(),
@@ -119,9 +117,7 @@ app.post('/plant_setup', hasId, (req, res) => {
 app.get('/get_one', (req, res) => {
   const monthRef = ref.child(new Date().getMonth());
   const dayRef = monthRef.child(new Date().getDate());
-  console.log(req.query);
   dayRef.child(req.query.plant_id).once('value', (snapshot) => {
-    console.log(snapshot.val());
     res.status(200).send(snapshot.val());
   });
 });
