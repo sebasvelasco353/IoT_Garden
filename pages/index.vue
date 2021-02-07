@@ -5,14 +5,24 @@
       <p>this is a test</p>
     </div>
     <div class="plants">
-        <div class="plant_content" v-for="(plant, index) in plants" :key="index">
+      <div
+        v-for="(plant, plantsKey) in plants"
+        :key="plantsKey"
+        class="plant_content"
+      >
+        <h1>{{ plantsKey }}</h1>
+        <div
+          v-for="(time, momentKey) in plant"
+          :key="momentKey"
+          class="plant_content--moment"
+        >
+          <h2>{{ time.moment }}</h2>
           <a href="plant-data">
-            <h3>Id:</h3>
-            <p>{{plant.plant_id}}</p>
             <h5>Air Humidity:</h5>
-            <p>{{ plant.air_humidity  }}</p>
+            <p>{{ time.air_humidity }}</p>
           </a>
         </div>
+      </div>
     </div>
   </section>
 </template>
@@ -21,7 +31,6 @@
 export default {
   async asyncData({ $axios }) {
     const plants = await $axios.$get('http://localhost:3000/api/get_plants_today');
-    console.log(plants);
     return {
       plants,
     };
@@ -46,6 +55,11 @@ export default {
   }
   .plant_content {
     width: 45vw;
+    padding: 50px;
+    border: solid lightgray 1px;
+    margin: 10px auto;
+  }
+  .plant_content--moment {
     padding: 50px;
     border: solid lightgray 1px;
     margin: 10px auto;

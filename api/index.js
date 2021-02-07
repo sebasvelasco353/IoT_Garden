@@ -6,11 +6,14 @@ const logger = require('morgan');
 const admin = require('firebase-admin');
 // Fetch the service account key JSON file contents
 const serviceAccount = require('./smartGarden_secret.json');
+
 // Initialize the app with a service account, granting admin privileges
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://smartgarden-81573-default-rtdb.firebaseio.com/',
-});
+if (admin.apps.length === 0) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://smartgarden-81573-default-rtdb.firebaseio.com/',
+  });
+}
 
 const app = express();
 
@@ -26,6 +29,7 @@ const ref = db.ref('/plants');
 
 // middleware
 function hasId(req, res, next) {
+  // TODO: fix this function in order to make it add items the right way
   const date = new Date();
   const month = date.getMonth();
   const day = date.getDate();
@@ -70,7 +74,7 @@ app.get('/get_plants_today', (req, res) => {
 });
 
 app.get('/get_plant_date', (req, res) => {
-  // TODO: call firebase and get everuything that has date = date
+  // TODO: call firebase and get everything that has date = date
   const { date, plant_id } = req.query;
   const route = `${date.split('-')[0]}/${date.split('-')[1]}/${plant_id}`;
   ref.child(route).once('value', (snapshot) => {
@@ -98,6 +102,7 @@ app.post('/plant_setup', hasId, (req, res) => {
   monthRef.child(day).child(req.body.plant_id).set({
     [partOfDay]: {
       date: `${date.getDate()}-${date.getMonth()}`,
+      moment: partOfDay,
       ...req.body,
     },
   }, (error) => {

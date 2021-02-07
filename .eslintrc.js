@@ -5,7 +5,7 @@ module.exports = {
     node: true,
   },
   extends: [
-    'plugin:vue/essential',
+    'plugin:vue/recommended',
     'airbnb-base',
   ],
   parserOptions: {
@@ -16,6 +16,6 @@ module.exports = {
     'vue',
   ],
   rules: {
-    camelcase: [2, { properties: 'never' }],
+    camelcase: { properties: 'never' },
   },
 };
