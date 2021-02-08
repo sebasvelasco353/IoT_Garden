@@ -29,16 +29,25 @@ const ref = db.ref('/plants');
 
 // middleware
 function hasId(req, res, next) {
-  // TODO: fix this function in order to make it add items the right way
   const date = new Date();
-  const month = date.getMonth();
+  const hours = date.getHours();
   const day = date.getDate();
+  const month = date.getMonth();
   const monthRef = ref.child(month);
-  const partOfDay = date.getHours();
+  let partOfDay;
+  if (hours < 12) {
+    partOfDay = 'morning';
+  } else if ((hours > 12) && (hours < 18)) {
+    partOfDay = 'evening';
+  } else {
+    partOfDay = 'night';
+  }
+  
   if (req.body.plant_id) {
     monthRef.child(day).child(req.body.plant_id).set({
       [partOfDay]: {
         date: `${date.getDate()}-${date.getMonth()}`,
+        moment: partOfDay,
         ...req.body,
       },
     }, (error) => {
@@ -49,7 +58,7 @@ function hasId(req, res, next) {
       }
       return res.status(200).json({
         ...req.body,
-        date,
+        date: `${date.getDate()}-${date.getMonth()}`,
         response: 'ok',
       });
     });
