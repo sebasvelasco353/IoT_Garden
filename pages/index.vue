@@ -34,7 +34,7 @@
 </template>
 
 <script>
-//TODO: Add call to endpoint calling for data of the selected dateRange
+// TODO: Add call to endpoint calling for data of the selected dateRange
 export default {
   async asyncData({ $axios }) {
     const plants = await $axios.$get('http://localhost:3000/api/get_plants_today');
