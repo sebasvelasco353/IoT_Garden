@@ -82,6 +82,9 @@ app.get('/get_plants_today', (req, res) => {
   });
 });
 
+//TODO: get data for all plants in the past 7 days
+//TODO: get data for all plants in the past month (if jan all of jan etc)
+
 app.get('/get_plant_date', (req, res) => {
   // TODO: call firebase and get everything that has date = date
   const { date, plant_id } = req.query;

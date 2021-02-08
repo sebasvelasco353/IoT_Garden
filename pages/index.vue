@@ -2,7 +2,13 @@
   <section class="container">
     <div>
       <h1>IoT_Garden Dashboard</h1>
-      <p>this is a test</p>
+      <p>You are looking at data for:</p>
+      <select v-model="dateRange">
+        <option disabled value="">Date Range</option>
+        <option>Today</option>
+        <option>This Week</option>
+        <option>This Month</option>
+      </select>
     </div>
     <div class="plants">
       <div
@@ -28,11 +34,17 @@
 </template>
 
 <script>
+//TODO: Add call to endpoint calling for data of the selected dateRange
 export default {
   async asyncData({ $axios }) {
     const plants = await $axios.$get('http://localhost:3000/api/get_plants_today');
     return {
       plants,
+    };
+  },
+  data() {
+    return {
+      dateRange: 'Today',
     };
   },
 };
